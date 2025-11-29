@@ -41,3 +41,9 @@ node_modules/
 package-lock.json
 yarn.lock
 
+# 其他專案檔案（不上傳到餐廳日記倉庫）
+cold_facts.html
+flashcard.html
+index.html
+index_upgrade.html
+
