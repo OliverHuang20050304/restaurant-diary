@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>字體風格轉換（宋體 → 手寫風）</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #fafafa;
+    }
+    h2 {
+        margin-bottom: 5px;
+    }
+    #preview {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border: 1px solid #ccc;
+        width: 400px;
+        font-size: 60px;
+        line-height: 1.4;
+    }
+    button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        font-size: 18px;
+    }
+</style>
+</head>
+<body>
+
+<h1>宋體 → 手寫風 字體風格轉換器（本機版）</h1>
+
+<label>輸入文字：</label><br>
+<input id="inputText" type="text" style="width:300px; font-size:20px;" placeholder="例如：台灣"><br><br>
+
+<button onclick="generate()">產生手寫風</button>
+
+<h2>輸出：</h2>
+<div id="preview">（結果會顯示在這裡）</div>
+
+<script>
+// 超簡易「手寫風」效果模擬器
+function generate() {
+    let text = document.getElementById("inputText").value;
+    if (!text) {
+        alert("請先輸入文字！");
+        return;
+    }
+
+    // 手寫風模擬：字體變粗、筆畫抖動、加入不規則曲線
+    let randomShift = () => Math.random() * 2 - 1;
+
+    let canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 300;
+    let ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, 800, 300);
+
+    ctx.font = "80px SimSun"; // 宋體（來源風格）
+    ctx.fillStyle = "#000";
+
+    // 模擬手寫筆觸：重複畫 + 抖動
+    for (let i = 0; i < 6; i++) {
+        ctx.fillText(text, 50 + randomShift()*5, 150 + randomShift()*5);
+    }
+
+    // 顯示到前端
+    document.getElementById("preview").innerHTML = "";
+    document.getElementById("preview").appendChild(canvas);
+}
+</script>
+
+</body>
+</html>

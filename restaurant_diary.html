@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的餐廳日記 - 品味生活的每一刻</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #8B7355;
+            --secondary-color: #D4C4B0;
+            --accent-color: #C9A961;
+            --text-dark: #2C2C2C;
+            --text-light: #6B6B6B;
+            --bg-light: #FAF8F5;
+            --bg-white: #FFFFFF;
+            --border-color: #E8E3DB;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 150px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.9rem 1rem 0.9rem 2.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+            background: var(--bg-white);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.9rem 1.5rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            color: var(--text-dark);
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary-color);
+            background: var(--secondary-color);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary {
+            padding: 0.9rem 2rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Restaurant Grid */
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .restaurant-card {
+            background: var(--bg-white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .restaurant-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--accent-color) 100%);
+        }
+
+        .restaurant-content {
+            padding: 1.5rem;
+        }
+
+        .restaurant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .restaurant-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .restaurant-category {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .restaurant-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .stars {
+            color: #FFD700;
+            font-size: 1.2rem;
+        }
+
+        .rating-text {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .restaurant-info {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .restaurant-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-icon {
+            flex: 1;
+            padding: 0.6rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-white);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-icon:hover {
+            background: var(--secondary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-icon.favorite {
+            color: #E74C3C;
+        }
+
+        .btn-icon.favorite.active {
+            background: #FFE5E5;
+            border-color: #E74C3C;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: var(--bg-white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: var(--text-dark);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.9rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .star-input {
+            font-size: 2rem;
+            cursor: pointer;
+            color: #DDD;
+            transition: color 0.2s ease;
+        }
+
+        .star-input:hover,
+        .star-input.active {
+            color: #FFD700;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+            border: 2px solid var(--border-color);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-secondary {
+            padding: 0.9rem 2rem;
+            background: var(--bg-white);
+            color: var(--text-dark);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-light);
+            border-color: var(--primary-color);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .empty-state-icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            .restaurant-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .search-box {
+                width: 100%;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--border-color);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>我的餐廳日記</h1>
+        <p>記錄每一餐的美好時光</p>
+    </header>
+
+    <div class="container">
+        <!-- Statistics -->
+        <div class="stats-bar">
+            <div class="stat-card">
+                <div class="stat-number" id="totalRestaurants">0</div>
+                <div class="stat-label">總餐廳數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalCategories">0</div>
+                <div class="stat-label">分類數</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="avgRating">0.0</div>
+                <div class="stat-label">平均評分</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="favoriteCount">0</div>
+                <div class="stat-label">收藏數</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜尋餐廳名稱、地址或評論...">
+            </div>
+            <div class="filter-group">
+                <button class="filter-btn active" data-category="all">全部</button>
+                <button class="filter-btn" data-category="中式">中式</button>
+                <button class="filter-btn" data-category="西式">西式</button>
+                <button class="filter-btn" data-category="日式">日式</button>
+                <button class="filter-btn" data-category="韓式">韓式</button>
+                <button class="filter-btn" data-category="甜點">甜點</button>
+                <button class="filter-btn" data-category="咖啡">咖啡</button>
+                <button class="filter-btn" data-category="其他">其他</button>
+            </div>
+            <button class="btn-primary" onclick="openAddModal()">+ 新增餐廳</button>
+        </div>
+
+        <!-- Restaurant Grid -->
+        <div class="restaurant-grid" id="restaurantGrid">
+            <!-- Restaurants will be dynamically inserted here -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <div class="empty-state-icon">🍽️</div>
+            <h3>還沒有記錄任何餐廳</h3>
+            <p>點擊「新增餐廳」開始記錄你的美食之旅吧！</p>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="restaurantModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">新增餐廳</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="restaurantForm">
+                    <input type="hidden" id="restaurantId">
+                    
+                    <div class="form-group">
+                        <label for="restaurantName">餐廳名稱 *</label>
+                        <input type="text" id="restaurantName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restaurantCategory">分類 *</label>
+                        <select id="restaurantCategory" required>
+                            <option value="">請選擇分類</option>
+                            <option value="中式">中式</option>
+                            <option value="西式">西式</option>
+                            <option value="日式">日式</option>
+                            <option value="韓式">韓式</option>
+                            <option value="甜點">甜點</option>
+                            <option value="咖啡">咖啡</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restaurantAddress">地址 *</label>
+                        <input type="text" id="restaurantAddress" required placeholder="例如：台北市信義區信義路五段7號">
+                    </div>
+
+                    <div class="form-group">
+                        <label>評分 *</label>
+                        <div class="rating-input">
+                            <span class="star-input" data-rating="1" onclick="setRating(1)">☆</span>
+                            <span class="star-input" data-rating="2" onclick="setRating(2)">☆</span>
+                            <span class="star-input" data-rating="3" onclick="setRating(3)">☆</span>
+                            <span class="star-input" data-rating="4" onclick="setRating(4)">☆</span>
+                            <span class="star-input" data-rating="5" onclick="setRating(5)">☆</span>
+                            <span id="ratingText" style="margin-left: 1rem; color: var(--text-light);">未評分</span>
+                        </div>
+                        <input type="hidden" id="restaurantRating" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="visitDate">造訪日期</label>
+                        <input type="date" id="visitDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="priceRange">價格範圍</label>
+                        <select id="priceRange">
+                            <option value="">請選擇</option>
+                            <option value="$">$ - 平價</option>
+                            <option value="$$">$$ - 中等</option>
+                            <option value="$$$">$$$ - 高價</option>
+                            <option value="$$$$">$$$$ - 奢華</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restaurantNotes">評論/筆記</label>
+                        <textarea id="restaurantNotes" placeholder="記錄這家餐廳的特色、推薦菜色、用餐感受..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="restaurantImage">照片網址</label>
+                        <input type="url" id="restaurantImage" placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <div class="form-group">
+                        <label>地圖位置</label>
+                        <div class="map-container" id="mapContainer">
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-light);">
+                                輸入地址後將顯示地圖
+                            </div>
+                        </div>
+                        <small style="color: var(--text-light); margin-top: 0.5rem; display: block;">
+                            提示：輸入地址後，點擊下方按鈕可在 Google Maps 中查看
+                        </small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="closeModal()">取消</button>
+                        <button type="submit" class="btn-primary">儲存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let restaurants = JSON.parse(localStorage.getItem('restaurants')) || [];
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentRating = 0;
+        let editingId = null;
+        let map = null;
+        let geocoder = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderRestaurants();
+            updateStats();
+            setupEventListeners();
+        });
+
+        // Event Listeners
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', function(e) {
+                currentSearch = e.target.value.toLowerCase();
+                renderRestaurants();
+            });
+
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentFilter = this.dataset.category;
+                    renderRestaurants();
+                });
+            });
+
+            document.getElementById('restaurantForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveRestaurant();
+            });
+
+            document.getElementById('restaurantAddress').addEventListener('blur', function() {
+                updateMapPreview();
+            });
+
+            // Close modal on outside click
+            document.getElementById('restaurantModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        }
+
+        // Rating System
+        function setRating(rating) {
+            currentRating = rating;
+            document.getElementById('restaurantRating').value = rating;
+            
+            const stars = document.querySelectorAll('.star-input');
+            const ratingText = document.getElementById('ratingText');
+            const texts = ['', '很差', '普通', '不錯', '很好', '極佳'];
+            
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                    star.textContent = '★';
+                } else {
+                    star.classList.remove('active');
+                    star.textContent = '☆';
+                }
+            });
+            
+            ratingText.textContent = texts[rating] || '未評分';
+        }
+
+        // Map Functions
+        function updateMapPreview() {
+            const address = document.getElementById('restaurantAddress').value;
+            if (!address) return;
+
+            const mapContainer = document.getElementById('mapContainer');
+            const encodedAddress = encodeURIComponent(address);
+            const mapUrl = `https://www.google.com/maps/embed/v1/place?key=YOUR_API_KEY&q=${encodedAddress}`;
+            
+            // For demo purposes, we'll use a static map or link
+            mapContainer.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 1rem; text-align: center;">
+                    <div style="color: var(--text-light); margin-bottom: 1rem;">📍 ${address}</div>
+                    <a href="https://www.google.com/maps/search/?api=1&query=${encodedAddress}" 
+                       target="_blank" 
+                       style="padding: 0.8rem 1.5rem; background: var(--primary-color); color: white; border-radius: 8px; text-decoration: none; font-weight: 500;">
+                        在 Google Maps 中開啟
+                    </a>
+                </div>
+            `;
+        }
+
+        // Modal Functions
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = '新增餐廳';
+            document.getElementById('restaurantForm').reset();
+            currentRating = 0;
+            document.querySelectorAll('.star-input').forEach(star => {
+                star.classList.remove('active');
+                star.textContent = '☆';
+            });
+            document.getElementById('ratingText').textContent = '未評分';
+            document.getElementById('mapContainer').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-light);">輸入地址後將顯示地圖</div>';
+            document.getElementById('restaurantModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const restaurant = restaurants.find(r => r.id === id);
+            if (!restaurant) return;
+
+            editingId = id;
+            document.getElementById('modalTitle').textContent = '編輯餐廳';
+            document.getElementById('restaurantId').value = id;
+            document.getElementById('restaurantName').value = restaurant.name;
+            document.getElementById('restaurantCategory').value = restaurant.category;
+            document.getElementById('restaurantAddress').value = restaurant.address;
+            document.getElementById('visitDate').value = restaurant.visitDate || '';
+            document.getElementById('priceRange').value = restaurant.priceRange || '';
+            document.getElementById('restaurantNotes').value = restaurant.notes || '';
+            document.getElementById('restaurantImage').value = restaurant.image || '';
+            
+            setRating(restaurant.rating);
+            updateMapPreview();
+            
+            document.getElementById('restaurantModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('restaurantModal').classList.remove('active');
+            editingId = null;
+        }
+
+        // CRUD Operations
+        function saveRestaurant() {
+            const formData = {
+                id: editingId || Date.now().toString(),
+                name: document.getElementById('restaurantName').value.trim(),
+                category: document.getElementById('restaurantCategory').value,
+                address: document.getElementById('restaurantAddress').value.trim(),
+                rating: parseInt(document.getElementById('restaurantRating').value),
+                visitDate: document.getElementById('visitDate').value,
+                priceRange: document.getElementById('priceRange').value,
+                notes: document.getElementById('restaurantNotes').value.trim(),
+                image: document.getElementById('restaurantImage').value.trim(),
+                favorite: editingId ? restaurants.find(r => r.id === editingId)?.favorite || false : false,
+                createdAt: editingId ? restaurants.find(r => r.id === editingId)?.createdAt : new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+
+            if (editingId) {
+                const index = restaurants.findIndex(r => r.id === editingId);
+                if (index !== -1) {
+                    restaurants[index] = formData;
+                }
+            } else {
+                restaurants.push(formData);
+            }
+
+            localStorage.setItem('restaurants', JSON.stringify(restaurants));
+            renderRestaurants();
+            updateStats();
+            closeModal();
+        }
+
+        function deleteRestaurant(id) {
+            if (confirm('確定要刪除這家餐廳的記錄嗎？')) {
+                restaurants = restaurants.filter(r => r.id !== id);
+                localStorage.setItem('restaurants', JSON.stringify(restaurants));
+                renderRestaurants();
+                updateStats();
+            }
+        }
+
+        function toggleFavorite(id) {
+            const restaurant = restaurants.find(r => r.id === id);
+            if (restaurant) {
+                restaurant.favorite = !restaurant.favorite;
+                localStorage.setItem('restaurants', JSON.stringify(restaurants));
+                renderRestaurants();
+                updateStats();
+            }
+        }
+
+        // Render Functions
+        function renderRestaurants() {
+            const grid = document.getElementById('restaurantGrid');
+            const emptyState = document.getElementById('emptyState');
+
+            let filtered = restaurants.filter(restaurant => {
+                const matchCategory = currentFilter === 'all' || restaurant.category === currentFilter;
+                const matchSearch = !currentSearch || 
+                    restaurant.name.toLowerCase().includes(currentSearch) ||
+                    restaurant.address.toLowerCase().includes(currentSearch) ||
+                    (restaurant.notes && restaurant.notes.toLowerCase().includes(currentSearch));
+                return matchCategory && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+
+            // Sort by favorite first, then by date
+            filtered.sort((a, b) => {
+                if (a.favorite && !b.favorite) return -1;
+                if (!a.favorite && b.favorite) return 1;
+                return new Date(b.updatedAt) - new Date(a.updatedAt);
+            });
+
+            grid.innerHTML = filtered.map(restaurant => `
+                <div class="restaurant-card">
+                    ${restaurant.image ? 
+                        `<img src="${restaurant.image}" alt="${restaurant.name}" class="restaurant-image" onerror="this.style.display='none'">` :
+                        `<div class="restaurant-image"></div>`
+                    }
+                    <div class="restaurant-content">
+                        <div class="restaurant-header">
+                            <div>
+                                <div class="restaurant-name">${restaurant.name}</div>
+                                <span class="restaurant-category">${restaurant.category}</span>
+                            </div>
+                        </div>
+                        <div class="restaurant-rating">
+                            <div class="stars">${'★'.repeat(restaurant.rating)}${'☆'.repeat(5 - restaurant.rating)}</div>
+                            <span class="rating-text">${restaurant.rating}/5</span>
+                        </div>
+                        <div class="restaurant-info">
+                            📍 ${restaurant.address}
+                        </div>
+                        ${restaurant.visitDate ? `
+                            <div class="restaurant-info">
+                                📅 ${new Date(restaurant.visitDate).toLocaleDateString('zh-TW')}
+                            </div>
+                        ` : ''}
+                        ${restaurant.priceRange ? `
+                            <div class="restaurant-info">
+                                💰 ${restaurant.priceRange}
+                            </div>
+                        ` : ''}
+                        ${restaurant.notes ? `
+                            <div class="restaurant-info" style="margin-top: 0.5rem; font-style: italic;">
+                                "${restaurant.notes.substring(0, 100)}${restaurant.notes.length > 100 ? '...' : ''}"
+                            </div>
+                        ` : ''}
+                        <div class="restaurant-actions">
+                            <button class="btn-icon favorite ${restaurant.favorite ? 'active' : ''}" 
+                                    onclick="toggleFavorite('${restaurant.id}')">
+                                ${restaurant.favorite ? '❤️ 已收藏' : '🤍 收藏'}
+                            </button>
+                            <button class="btn-icon" onclick="openEditModal('${restaurant.id}')">✏️ 編輯</button>
+                            <button class="btn-icon" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(restaurant.address)}', '_blank')">
+                                🗺️ 地圖
+                            </button>
+                            <button class="btn-icon" onclick="deleteRestaurant('${restaurant.id}')" style="color: #E74C3C;">🗑️ 刪除</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            const total = restaurants.length;
+            const categories = new Set(restaurants.map(r => r.category)).size;
+            const avgRating = total > 0 
+                ? (restaurants.reduce((sum, r) => sum + r.rating, 0) / total).toFixed(1)
+                : '0.0';
+            const favorites = restaurants.filter(r => r.favorite).length;
+
+            document.getElementById('totalRestaurants').textContent = total;
+            document.getElementById('totalCategories').textContent = categories;
+            document.getElementById('avgRating').textContent = avgRating;
+            document.getElementById('favoriteCount').textContent = favorites;
+        }
+    </script>
+</body>
+</html>

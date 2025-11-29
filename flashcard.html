@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單字卡學習系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .tab-btn.active {
+            background: #764ba2;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            margin-bottom: 20px;
+        }
+
+        /* 單字管理區域 */
+        .word-form {
+            display: grid;
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        /* 單字列表 */
+        .word-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .word-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .word-item:hover {
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .word-info {
+            flex: 1;
+        }
+
+        .word-info h3 {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .word-info p {
+            color: #666;
+            margin: 3px 0;
+        }
+
+        .word-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        /* 搜尋區域 */
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        /* 翻卡學習區域 */
+        .flashcard-container {
+            perspective: 1000px;
+            margin: 40px auto;
+            max-width: 500px;
+        }
+
+        .flashcard {
+            width: 100%;
+            height: 300px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+        }
+
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front,
+        .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        .flashcard-front {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .flashcard-back {
+            background: white;
+            color: #333;
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-word {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .flashcard-phonetic {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .flashcard-meaning {
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .flashcard-partOfSpeech {
+            font-size: 1em;
+            color: #999;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        .flashcard-example {
+            font-size: 1em;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .flashcard-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            color: white;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .word-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .word-actions {
+                width: 100%;
+                margin-top: 15px;
+            }
+
+            .flashcard-word {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 單字卡學習系統</h1>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalWords">0</div>
+                    <div class="stat-label">總單字數</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="studiedToday">0</div>
+                    <div class="stat-label">今日學習</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('manage')">單字管理</button>
+            <button class="tab-btn" onclick="switchTab('study')">學習模式</button>
+        </div>
+
+        <!-- 單字管理標籤 -->
+        <div id="manageTab" class="tab-content active">
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">新增單字</h2>
+                <form id="wordForm" class="word-form">
+                    <div class="form-group">
+                        <label for="word">單字 *</label>
+                        <input type="text" id="word" required placeholder="例如：apple">
+                    </div>
+                    <div class="form-group">
+                        <label for="phonetic">音標</label>
+                        <input type="text" id="phonetic" placeholder="例如：/ˈæpl/">
+                    </div>
+                    <div class="form-group">
+                        <label for="meaning">中文解釋 *</label>
+                        <input type="text" id="meaning" required placeholder="例如：蘋果">
+                    </div>
+                    <div class="form-group">
+                        <label for="partOfSpeech">詞性</label>
+                        <select id="partOfSpeech">
+                            <option value="">選擇詞性</option>
+                            <option value="n.">名詞 (n.)</option>
+                            <option value="v.">動詞 (v.)</option>
+                            <option value="adj.">形容詞 (adj.)</option>
+                            <option value="adv.">副詞 (adv.)</option>
+                            <option value="prep.">介詞 (prep.)</option>
+                            <option value="conj.">連接詞 (conj.)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="example">例句</label>
+                        <textarea id="example" placeholder="例如：I like to eat an apple every day."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">新增單字</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 20px;">單字列表</h2>
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="搜尋單字、解釋或例句..." oninput="filterWords()">
+                </div>
+                <div id="wordList" class="word-list">
+                    <!-- 單字列表將動態生成 -->
+                </div>
+            </div>
+        </div>
+
+        <!-- 學習模式標籤 -->
+        <div id="studyTab" class="tab-content">
+            <div class="card">
+                <div id="studyContent">
+                    <div class="flashcard-container">
+                        <div class="flashcard" id="flashcard" onclick="flipCard()">
+                            <div class="flashcard-front">
+                                <div class="flashcard-word" id="cardWord">點擊開始學習</div>
+                                <div class="flashcard-phonetic" id="cardPhonetic"></div>
+                            </div>
+                            <div class="flashcard-back">
+                                <div class="flashcard-meaning" id="cardMeaning">請先新增單字</div>
+                                <div class="flashcard-partOfSpeech" id="cardPartOfSpeech"></div>
+                                <div class="flashcard-example" id="cardExample"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flashcard-controls">
+                        <button class="btn btn-secondary" onclick="previousCard()">上一張</button>
+                        <button class="btn btn-primary" onclick="nextCard()">下一張</button>
+                        <button class="btn btn-danger" onclick="deleteCurrentCard()">刪除</button>
+                    </div>
+                    <div style="text-align: center; margin-top: 20px; color: #666;">
+                        <span id="cardProgress">0 / 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 資料儲存
+        let words = [];
+        let currentCardIndex = 0;
+        let filteredWords = [];
+
+        // 從 LocalStorage 載入資料
+        function loadWords() {
+            const saved = localStorage.getItem('flashcardWords');
+            if (saved) {
+                words = JSON.parse(saved);
+            }
+            filteredWords = [...words];
+            renderWordList();
+            updateStats();
+            if (words.length > 0) {
+                showCard(0);
+            }
+        }
+
+        // 儲存資料到 LocalStorage
+        function saveWords() {
+            localStorage.setItem('flashcardWords', JSON.stringify(words));
+            updateStats();
+        }
+
+        // 更新統計資訊
+        function updateStats() {
+            document.getElementById('totalWords').textContent = words.length;
+            // 今日學習數可以根據需要實作更複雜的邏輯
+            document.getElementById('studiedToday').textContent = words.length > 0 ? '1+' : '0';
+        }
+
+        // 切換標籤
+        function switchTab(tab) {
+            // 隱藏所有標籤內容
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 顯示選中的標籤
+            if (tab === 'manage') {
+                document.getElementById('manageTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else {
+                document.getElementById('studyTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                if (words.length > 0) {
+                    currentCardIndex = 0;
+                    showCard(0);
+                }
+            }
+        }
+
+        // 新增單字
+        document.getElementById('wordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const word = {
+                id: Date.now(),
+                word: document.getElementById('word').value.trim(),
+                phonetic: document.getElementById('phonetic').value.trim(),
+                meaning: document.getElementById('meaning').value.trim(),
+                partOfSpeech: document.getElementById('partOfSpeech').value,
+                example: document.getElementById('example').value.trim(),
+                createdAt: new Date().toISOString()
+            };
+
+            words.push(word);
+            filteredWords = [...words];
+            saveWords();
+            renderWordList();
+            
+            // 清空表單
+            document.getElementById('wordForm').reset();
+            
+            alert('單字新增成功！');
+        });
+
+        // 渲染單字列表
+        function renderWordList() {
+            const listContainer = document.getElementById('wordList');
+            
+            if (filteredWords.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>還沒有單字</h3>
+                        <p>請在上方表單新增單字</p>
+                    </div>
+                `;
+                return;
+            }
+
+            listContainer.innerHTML = filteredWords.map(word => `
+                <div class="word-item">
+                    <div class="word-info">
+                        <h3>${word.word} ${word.partOfSpeech ? `<span style="color: #999; font-size: 0.8em;">${word.partOfSpeech}</span>` : ''}</h3>
+                        ${word.phonetic ? `<p style="color: #999;">${word.phonetic}</p>` : ''}
+                        <p><strong>解釋：</strong>${word.meaning}</p>
+                        ${word.example ? `<p style="color: #666; font-style: italic;">例句：${word.example}</p>` : ''}
+                    </div>
+                    <div class="word-actions">
+                        <button class="btn btn-secondary btn-small" onclick="editWord(${word.id})">編輯</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteWord(${word.id})">刪除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 編輯單字
+        function editWord(id) {
+            const word = words.find(w => w.id === id);
+            if (!word) return;
+
+            // 填入表單
+            document.getElementById('word').value = word.word;
+            document.getElementById('phonetic').value = word.phonetic;
+            document.getElementById('meaning').value = word.meaning;
+            document.getElementById('partOfSpeech').value = word.partOfSpeech;
+            document.getElementById('example').value = word.example;
+
+            // 刪除原單字
+            words = words.filter(w => w.id !== id);
+            saveWords();
+            renderWordList();
+
+            // 滾動到表單
+            document.getElementById('wordForm').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 刪除單字
+        function deleteWord(id) {
+            if (confirm('確定要刪除這個單字嗎？')) {
+                words = words.filter(w => w.id !== id);
+                filteredWords = filteredWords.filter(w => w.id !== id);
+                saveWords();
+                renderWordList();
+                
+                // 如果是在學習模式，更新卡片
+                if (document.getElementById('studyTab').classList.contains('active')) {
+                    if (filteredWords.length === 0) {
+                        document.getElementById('cardWord').textContent = '沒有單字了';
+                        document.getElementById('cardMeaning').textContent = '請先新增單字';
+                        document.getElementById('cardPhonetic').textContent = '';
+                        document.getElementById('cardPartOfSpeech').textContent = '';
+                        document.getElementById('cardExample').textContent = '';
+                        document.getElementById('cardProgress').textContent = '0 / 0';
+                    } else {
+                        if (currentCardIndex >= filteredWords.length) {
+                            currentCardIndex = 0;
+                        }
+                        showCard(currentCardIndex);
+                    }
+                }
+            }
+        }
+
+        // 搜尋/篩選單字
+        function filterWords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            filteredWords = words.filter(word => 
+                word.word.toLowerCase().includes(searchTerm) ||
+                word.meaning.toLowerCase().includes(searchTerm) ||
+                (word.example && word.example.toLowerCase().includes(searchTerm))
+            );
+            renderWordList();
+        }
+
+        // 顯示卡片
+        function showCard(index) {
+            if (filteredWords.length === 0) {
+                return;
+            }
+
+            if (index < 0) index = filteredWords.length - 1;
+            if (index >= filteredWords.length) index = 0;
+
+            currentCardIndex = index;
+            const word = filteredWords[index];
+
+            // 先重置卡片翻轉狀態（在更新內容之前）
+            const flashcard = document.getElementById('flashcard');
+            flashcard.classList.remove('flipped');
+            
+            // 強制同步重排，確保 flipped 類已移除
+            void flashcard.offsetHeight;
+            
+            // 暫時禁用 transition，避免在更新內容時看到翻轉動畫
+            const originalTransition = flashcard.style.transition;
+            flashcard.style.transition = 'none';
+            
+            // 更新卡片內容
+            document.getElementById('cardWord').textContent = word.word;
+            document.getElementById('cardPhonetic').textContent = word.phonetic || '';
+            document.getElementById('cardMeaning').textContent = word.meaning;
+            document.getElementById('cardPartOfSpeech').textContent = word.partOfSpeech || '';
+            document.getElementById('cardExample').textContent = word.example || '';
+            
+            // 在下一幀恢復 transition
+            requestAnimationFrame(() => {
+                flashcard.style.transition = originalTransition;
+            });
+            
+            // 更新進度
+            document.getElementById('cardProgress').textContent = `${index + 1} / ${filteredWords.length}`;
+        }
+
+        // 翻轉卡片
+        function flipCard() {
+            if (filteredWords.length === 0) return;
+            document.getElementById('flashcard').classList.toggle('flipped');
+        }
+
+        // 上一張卡片
+        function previousCard() {
+            if (filteredWords.length === 0) return;
+            showCard(currentCardIndex - 1);
+        }
+
+        // 下一張卡片
+        function nextCard() {
+            if (filteredWords.length === 0) return;
+            showCard(currentCardIndex + 1);
+        }
+
+        // 刪除當前卡片
+        function deleteCurrentCard() {
+            if (filteredWords.length === 0) return;
+            const currentWord = filteredWords[currentCardIndex];
+            deleteWord(currentWord.id);
+        }
+
+        // 鍵盤快捷鍵
+        document.addEventListener('keydown', function(e) {
+            // 只在學習模式啟用快捷鍵
+            if (!document.getElementById('studyTab').classList.contains('active')) return;
+
+            if (e.key === 'ArrowLeft') {
+                previousCard();
+            } else if (e.key === 'ArrowRight') {
+                nextCard();
+            } else if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                flipCard();
+            }
+        });
+
+        // 初始化
+        loadWords();
+    </script>
+</body>
+</html>

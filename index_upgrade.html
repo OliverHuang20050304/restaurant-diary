@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>宋體 → 手寫風（升級版 A）</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        background: #f2f2f2;
+    }
+    #preview {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border: 1px solid #ccc;
+        width: 450px;
+        min-height: 200px;
+    }
+    input {
+        font-size: 20px;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 18px;
+        margin-top: 10px;
+    }
+</style>
+</head>
+<body>
+
+<h1>宋體 → 手寫風（升級版 A）</h1>
+
+<label>輸入文字：</label><br>
+<input id="inputText" type="text" style="width:300px;" placeholder="例如：台灣"><br><br>
+
+<button onclick="generate()">產生手寫風</button>
+
+<h2>預覽：</h2>
+<div id="preview">（結果圖片會出現在這裡）</div>
+
+<script>
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+function generate() {
+    let text = document.getElementById("inputText").value;
+    if (!text) {
+        alert("請先輸入文字！");
+        return;
+    }
+
+    // 建立 canvas
+    let canvas = document.createElement("canvas");
+    canvas.width = 900;
+    canvas.height = 300;
+    let ctx = canvas.getContext("2d");
+
+    // 背景
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 基礎字體（宋體）
+    ctx.font = "100px SimSun";
+
+    // 多層筆畫疊加產生手寫效果
+    for (let i = 0; i < 12; i++) {
+        let dx = random(-3, 3);  // 左右抖動
+        let dy = random(-3, 3);  // 上下抖動
+
+        // 筆觸粗細變化
+        ctx.lineWidth = random(1, 3);
+
+        // 顏色深淺變化（像筆壓）
+        let shade = Math.floor(random(0, 60));
+        ctx.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+
+        // 模糊邊緣
+        ctx.filter = `blur(${random(0, 1.5)}px)`;
+
+        ctx.fillText(text, 80 + dx, 160 + dy);
+    }
+
+    // 額外筆觸毛邊層
+    ctx.filter = "blur(0.6px)";
+    ctx.fillStyle = "rgba(0,0,0,0.8)";
+    ctx.fillText(text, 80, 160);
+
+    // 顯示結果
+    let preview = document.getElementById("preview");
+    preview.innerHTML = "";
+    preview.appendChild(canvas);
+}
+</script>
+
+</body>
+</html>
