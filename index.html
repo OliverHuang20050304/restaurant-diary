@@ -22,6 +22,30 @@
             --border-color: #E8E3DB;
             --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.12);
+            --modal-overlay: rgba(0, 0, 0, 0.5);
+            --error-bg: #FFE5E5;
+            --error-text: #E74C3C;
+            --success-bg: #E5F7E5;
+            --success-text: #27AE60;
+        }
+
+        /* Dark Mode Variables */
+        [data-theme="dark"] {
+            --primary-color: #B89A7A;
+            --secondary-color: #6B5D4F;
+            --accent-color: #E8C87A;
+            --text-dark: #E8E8E8;
+            --text-light: #B0B0B0;
+            --bg-light: #1A1A1A;
+            --bg-white: #2C2C2C;
+            --border-color: #404040;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.5);
+            --modal-overlay: rgba(0, 0, 0, 0.8);
+            --error-bg: #3D2A2A;
+            --error-text: #FF6B6B;
+            --success-bg: #2A3D2A;
+            --success-text: #6BFF6B;
         }
 
         body {
@@ -29,6 +53,7 @@
             background: var(--bg-light);
             color: var(--text-dark);
             line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* Header */
@@ -54,10 +79,16 @@
             font-weight: 300;
         }
 
-        .user-info {
+        .header-controls {
             position: absolute;
             top: 1rem;
             right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
             display: flex;
             align-items: center;
             gap: 1rem;
@@ -84,11 +115,45 @@
             border-color: rgba(255, 255, 255, 0.5);
         }
 
+        /* Dark Mode Toggle Button */
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+
         @media (max-width: 768px) {
-            .user-info {
+            .header-controls {
                 position: static;
                 justify-content: center;
                 margin-top: 1rem;
+                flex-wrap: wrap;
+            }
+
+            .theme-toggle {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
             }
         }
 
@@ -97,6 +162,7 @@
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
+            transition: padding 0.3s ease;
         }
 
         /* Stats Bar */
@@ -115,7 +181,7 @@
             box-shadow: var(--shadow);
             text-align: center;
             min-width: 150px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
         }
 
         .stat-card:hover {
@@ -156,8 +222,9 @@
             border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
             background: var(--bg-white);
+            color: var(--text-dark);
         }
 
         .search-box input:focus {
@@ -189,6 +256,8 @@
             font-size: 0.95rem;
             transition: all 0.3s ease;
             color: var(--text-dark);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
         }
 
         .filter-btn:hover {
@@ -213,6 +282,9 @@
             font-weight: 500;
             transition: all 0.3s ease;
             box-shadow: var(--shadow);
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            min-height: 44px;
         }
 
         .btn-primary:hover {
@@ -234,7 +306,7 @@
             border-radius: 16px;
             overflow: hidden;
             box-shadow: var(--shadow);
-            transition: all 0.3s ease;
+            transition: all 0.3s ease, background 0.3s ease;
             cursor: pointer;
         }
 
@@ -346,9 +418,10 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: var(--modal-overlay);
             z-index: 1000;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .modal.active {
@@ -367,6 +440,8 @@
             overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.3s ease;
+            -webkit-overflow-scrolling: touch;
+            transition: background 0.3s ease;
         }
 
         @keyframes slideUp {
@@ -431,7 +506,9 @@
             border-radius: 8px;
             font-size: 1rem;
             font-family: inherit;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, background 0.3s ease, color 0.3s ease;
+            background: var(--bg-white);
+            color: var(--text-dark);
         }
 
         .form-group input:focus,
@@ -518,20 +595,175 @@
 
         /* Responsive */
         @media (max-width: 768px) {
+            header {
+                padding: 2rem 1rem;
+            }
+
             header h1 {
-                font-size: 2rem;
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+
+            header p {
+                font-size: 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-bar {
+                gap: 1rem;
+                margin: 1.5rem 0;
+            }
+
+            .stat-card {
+                padding: 1rem 1.5rem;
+                min-width: 120px;
+                flex: 1;
+                min-width: calc(50% - 0.5rem);
+            }
+
+            .stat-number {
+                font-size: 1.5rem;
+            }
+
+            .stat-label {
+                font-size: 0.85rem;
             }
 
             .restaurant-grid {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
 
             .controls {
                 flex-direction: column;
+                gap: 1rem;
             }
 
             .search-box {
                 width: 100%;
+                min-width: 100%;
+            }
+
+            .filter-group {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                padding-bottom: 0.5rem;
+            }
+
+            .filter-group::-webkit-scrollbar {
+                display: none;
+            }
+
+            .filter-btn {
+                padding: 0.75rem 1.2rem;
+                font-size: 0.9rem;
+                white-space: nowrap;
+                min-height: 44px;
+            }
+
+            .btn-primary {
+                width: 100%;
+                padding: 1rem 2rem;
+                font-size: 1rem;
+            }
+
+            .restaurant-content {
+                padding: 1.2rem;
+            }
+
+            .restaurant-name {
+                font-size: 1.2rem;
+            }
+
+            .restaurant-actions {
+                flex-wrap: wrap;
+            }
+
+            .btn-icon {
+                min-height: 44px;
+                font-size: 0.85rem;
+                padding: 0.75rem 0.5rem;
+            }
+
+            .modal.active {
+                padding: 1rem;
+                align-items: flex-start;
+            }
+
+            .modal-content {
+                max-width: 100%;
+                border-radius: 16px;
+                max-height: calc(100vh - 2rem);
+            }
+
+            .modal-header {
+                padding: 1.5rem 1.5rem 1rem;
+            }
+
+            .modal-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .modal-body {
+                padding: 1.5rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.2rem;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                padding: 0.85rem;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+
+            .rating-input {
+                flex-wrap: wrap;
+            }
+
+            .star-input {
+                font-size: 1.8rem;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+                gap: 0.75rem;
+            }
+
+            .btn-secondary,
+            .btn-primary {
+                width: 100%;
+            }
+
+            .map-container {
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stat-card {
+                min-width: 100%;
+            }
+
+            .restaurant-actions {
+                gap: 0.4rem;
+            }
+
+            .btn-icon {
+                flex: 1 1 calc(50% - 0.2rem);
+                font-size: 0.8rem;
             }
         }
 
@@ -593,13 +825,14 @@
         }
 
         .error-message {
-            background: #FFE5E5;
-            color: #E74C3C;
+            background: var(--error-bg);
+            color: var(--error-text);
             padding: 0.8rem;
             border-radius: 6px;
             margin-bottom: 1rem;
             font-size: 0.9rem;
             display: none;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .error-message.show {
@@ -607,13 +840,14 @@
         }
 
         .success-message {
-            background: #E5F7E5;
-            color: #27AE60;
+            background: var(--success-bg);
+            color: var(--success-text);
             padding: 0.8rem;
             border-radius: 6px;
             margin-bottom: 1rem;
             font-size: 0.9rem;
             display: none;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         .success-message.show {
@@ -649,9 +883,14 @@
     <header>
         <h1>我的餐廳日記</h1>
         <p>記錄每一餐的美好時光</p>
-        <div class="user-info" id="userInfo" style="display: none;">
-            <span class="user-name" id="userName"></span>
-            <button class="logout-btn" onclick="logout()">登出</button>
+        <div class="header-controls" id="headerControls" style="display: none;">
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" aria-label="切換主題">
+                🌙
+            </button>
+            <div class="user-info">
+                <span class="user-name" id="userName"></span>
+                <button class="logout-btn" onclick="logout()">登出</button>
+            </div>
         </div>
     </header>
 
@@ -925,16 +1164,37 @@
             }
         }
 
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+            }
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        }
+
         function showAuthModal() {
             document.getElementById('authModal').classList.add('active');
             document.getElementById('mainContent').classList.add('hidden');
-            document.getElementById('userInfo').style.display = 'none';
+            document.getElementById('headerControls').style.display = 'none';
         }
 
         function showMainContent() {
             document.getElementById('authModal').classList.remove('active');
             document.getElementById('mainContent').classList.remove('hidden');
-            document.getElementById('userInfo').style.display = 'flex';
+            document.getElementById('headerControls').style.display = 'flex';
             document.getElementById('userName').textContent = `歡迎，${currentUser}`;
             renderRestaurants();
             updateStats();
@@ -1070,6 +1330,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            initTheme();
             checkLoginStatus();
             setupEventListeners();
             
